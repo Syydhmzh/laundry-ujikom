@@ -6,20 +6,21 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">{{ $title }}</h3>
-                <form action="{{ route('customer.update', $service->id)}}" method="post">
+                <form action="{{ route('customer.update', $customer->id)}}" method="post">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
                         <label for="">Name</label>
-                        <input type="text" value="{{ $service->service_name }}"  placeholder="Masukkan Nama service" name="service_name" class="form-control" required>
+                        <input type="text" value="{{ $customer->name }}"  placeholder="Masukkan Nama customer" name="name" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="">Email</label>
-                        <input type="email" value="{{ $service->price }}"  placeholder="Masukkan Nama service" name="price" class="form-control" required>
+                        <label for="">phone</label>
+                        <input type="tel" value="{{ $customer->phone }}"  placeholder="Masukkan Nama customer" name="phone" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="">Address</label>
-                        <input type="address" value="{{ $service->description }}"  placeholder="Masukkan Nama service" name="description" class="form-control" required>
+                        <textarea  name="address" class="form-control" required>{{ $customer->address }}</textarea>
+
                     </div>
                     <div class="mb-3">
                         <button class="btn btn-primary" type="submit">Simpan</button>

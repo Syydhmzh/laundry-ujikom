@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Laundry - POS</title>
+    <link href="{{ asset('assets/img/laundry.png') }}" rel="icon">
+  <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <title>{{ $title }}</title>
     <style>
         * {
             margin: 0;
@@ -392,12 +395,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🧺 Laundry Ham pedes dikit</h1>
-            <p class="subtitle">Laundry asik asik asik</p>
+            <h1>🧺 Sistem Informasi Laundry</h1>
+            <p class="subtitle">Point of Sales System - Kelola Transaksi Laundry dengan Mudah</p>
         </div>
 
         <!-- Statistics -->
@@ -427,23 +431,23 @@
                 <h2>🛒 Transaksi Baru</h2>
 
                 <form id="transactionForm">
-                    <div class="form-group" >
-                        <label for="customerName">Nama Pelanggan</label>
-                        <select name="id_customer" id="customerName" class="form-control">
-                                    <option value="">Pilih Customer</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}" data-phone="{{ $customer->phone }}" data-address="{{ $customer->address }}">{{ $customer->name }}</option>
-                                    @endforeach
-                                </select>
+                    <div class="form-group">
+                        <label for="customer_id">Customer</label>
+                        <select name="customer_id" id="customer_id" class="form-control" required>
+                            <option value="">Pilih Customer</option>
+                            @foreach ($customers as $customer)
+                                <option data-phone="{{ $customer->phone }}" data-address="{{ $customer->address }}" value="{{ $customer->id }}">{{ $customer->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label >No. Telepon</label>
+                            <label for="customerPhone">No. Telepon</label>
                             <input type="tel" id="customerPhone" required>
                         </div>
                         <div class="form-group">
-                            <label>Alamat</label>
+                            <label for="customerAddress">Alamat</label>
                             <input type="text" id="customerAddress">
                         </div>
                     </div>
@@ -451,29 +455,52 @@
                     <div class="form-group">
                         <label>Pilih Layanan</label>
                         <div class="services-grid">
-                            @foreach ($services as $service)
-                            <button type="button" class="service-card" onclick="addService({{ $service->id}}, {{ $service->price }})">
-                                <h3>{{ $service->service_name }}</h3>
-                                <div class="price">Rp {{ $service->price }}/kg</div>
+                        @foreach ($services as $service)
+                        <button type="button" class="service-card" onclick="addService({{ $service->id }}, {{ $service->price }})">
+                            <h3>🌪️ {{ $service->service_name }}</h3>
+                            <div class="price">{{ $service->price }}/kg</div>
+                        </button>
+                        @endforeach
+                            {{-- <button type="button" class="service-card" onclick="addService('Cuci Setrika', 7000)">
+                                <h3>👔 Cuci Setrika</h3>
+                                <div class="price">Rp 7.000/kg</div>
                             </button>
-                            @endforeach
-
+                            <button type="button" class="service-card" onclick="addService('Setrika Saja', 3000)">
+                                <h3>🔥 Setrika Saja</h3>
+                                <div class="price">Rp 3.000/kg</div>
+                            </button>
+                            <button type="button" class="service-card" onclick="addService('Dry Clean', 15000)">
+                                <h3>✨ Dry Clean</h3>
+                                <div class="price">Rp 15.000/kg</div>
+                            </button>
+                            <button type="button" class="service-card" onclick="addService('Cuci Sepatu', 25000)">
+                                <h3>👟 Cuci Sepatu</h3>
+                                <div class="price">Rp 25.000/pasang</div>
+                            </button>
+                            <button type="button" class="service-card" onclick="addService('Cuci Karpet', 20000)">
+                                <h3>🏠 Cuci Karpet</h3>
+                                <div class="price">Rp 20.000/m²</div>
+                            </button> --}}
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="serviceWeight">Berat/Jumlah</label>
-                            <input type="number" id="serviceWeight" step="0.1" min="0.1" required>
+                            <input type="number" id="serviceWeight" name="serviceWeight" step="0.1" min="0.1" required>
                         </div>
                         <div class="form-group">
                             <label for="serviceType">Jenis Layanan</label>
                             <select id="serviceType" required>
-                                <option value="">Pilih Layanan</option>
+                                <option disabled selected>Pilih Layanan</option>
                                 @foreach ($services as $service)
-                                <option data-price="{{ $service->price }}" value="{{ $service->id }}">{{ $service->service_name }}</option>
+                                <option data-serv-name="{{ $service->service_name }}" data-price="{{ $service->price }}" value="{{ $service->id }}">{{ $service->service_name }}</option>
                                 @endforeach
-
+                                {{-- <option value="Cuci Setrika">Cuci Setrika</option>
+                                <option value="Setrika Saja">Setrika Saja</option>
+                                <option value="Dry Clean">Dry Clean</option>
+                                <option value="Cuci Sepatu">Cuci Sepatu</option>
+                                <option value="Cuci Karpet">Cuci Karpet</option> --}}
                             </select>
                         </div>
                     </div>
@@ -483,7 +510,8 @@
                         <textarea id="notes" rows="3" placeholder="Catatan khusus untuk pesanan..."></textarea>
                     </div>
 
-                    <button type="button" class="btn btn-primary" onclick="addToCart()" style="width: 100%; margin-bottom: 10px;">
+                    <button type="button" class="btn btn-primary" onclick="addToCart()"
+                        style="width: 100%; margin-bottom: 10px;">
                         ➕ Tambah ke Keranjang
                     </button>
                 </form>
@@ -508,7 +536,8 @@
                     <div class="total-section">
                         <h3>Total Pembayaran</h3>
                         <div class="total-amount" id="totalAmount">Rp 0</div>
-                        <button class="btn btn-success" onclick="processTransaction()" style="width: 100%; margin-top: 15px;">
+                        <button class="btn btn-success" onclick="processTransaction()"
+                            style="width: 100%; margin-top: 15px;">
                             💳 Proses Transaksi
                         </button>
                     </div>
@@ -518,23 +547,17 @@
             <!-- Right Panel: Transaction History -->
             <div class="card">
                 <h2>📊 Riwayat Transaksi</h2>
-                <div class="transaction-list" id="transactionHistory">
+                <div class="transaction-list" id="">
+                    @foreach ($datas as $key => $data )
                     <div class="transaction-item">
-                        <h4>TRX-001 - John Doe</h4>
-                        <p>📞 0812-3456-7890</p>
-                        <p>🛍️ Cuci Setrika - 2.5kg</p>
-                        <p>💰 Rp 17.500</p>
-                        <p>📅 13 Juli 2025, 14:30</p>
-                        <span class="status-badge status-process">Proses</span>
+                        <h4>{{ $data->order_code }}</h4>
+                        <p>📞 {{ $data->customer->phone }}</p>
+                        <p>🛍️ {{ $data->customer->address }}</p>
+                        <p>💰 Rp. {{ number_format($data->customer->total) }}</p>
+                        <p>📅 {{date('d F Y', strtotime($data->order_end_date)) }}</p>
+                        <span class="status-badge status-process">{{ $data->status_text }}</span>
                     </div>
-                    <div class="transaction-item">
-                        <h4>TRX-002 - Jane Smith</h4>
-                        <p>📞 0813-7654-3210</p>
-                        <p>🛍️ Cuci Kering - 3kg</p>
-                        <p>💰 Rp 15.000</p>
-                        <p>📅 13 Juli 2025, 13:15</p>
-                        <span class="status-badge status-ready">Siap</span>
-                    </div>
+                    @endforeach
                 </div>
 
                 <button class="btn btn-warning" onclick="showAllTransactions()" style="width: 100%; margin-top: 15px;">
@@ -565,26 +588,21 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
     <script>
-        const selectCustomer = document.querySelector('#customerName');
-        selectCustomer.addEventListener('change', ()=> {
+        const selectCustomer = document.querySelector("#customer_id");
+        selectCustomer.addEventListener('change', () => {
             const optionCustomer = selectCustomer.options[selectCustomer.selectedIndex];
             const phoneCustomer = optionCustomer.dataset.phone;
-            const addressCustomer = optionCustomer.dataset.address;
-            document.querySelector('#customerPhone').value = phoneCustomer;
-            document.querySelector('#customerAddress').value = addressCustomer;
-        });
+            const customerAddress = optionCustomer.dataset.address;
 
+            document.querySelector('#customerPhone').value = phoneCustomer;
+            document.querySelector('#customerAddress').value = customerAddress;
+        });
         let cart = [];
         let transactions = JSON.parse(localStorage.getItem('laundryTransactions')) || [];
         let transactionCounter = transactions.length + 1;
+        let serviceName = document.getElementById('serviceType').options[ document.getElementById('serviceType').selectedIndex
+].text;
 
 
         function addService(serviceName, price) {
@@ -592,44 +610,6 @@
             document.getElementById('serviceWeight').focus();
         }
 
-        function addToCart() {
-            const serviceType = document.getElementById('serviceType').value;
-            const weight = parseFloat(document.getElementById('serviceWeight').value);
-            const notes = document.getElementById('notes').value;
-
-            if (!serviceType || !weight || weight <= 0) {
-                alert('Mohon lengkapi semua field yang diperlukan!');
-                return;
-            }
-
-            const prices = {
-                'Cuci Besar': 7000,
-                'Hanya Gosok': 5000,
-                'Hanya Cuci': 4500,
-                'Cuci dan Gosok': 5000,
-
-            };
-
-            const price = prices[serviceType];
-            const subtotal = price * weight;
-
-            const item = {
-                id: Date.now(),
-                service: serviceType,
-                weight: weight,
-                price: price,
-                subtotal: subtotal,
-                notes: notes
-            };
-
-            cart.push(item);
-            updateCartDisplay();
-
-            // Clear form
-            document.getElementById('serviceType').value = '';
-            document.getElementById('serviceWeight').value = '';
-            document.getElementById('notes').value = '';
-        }
 
         function updateCartDisplay() {
             const cartItems = document.getElementById('cartItems');
@@ -646,22 +626,7 @@
             let html = '';
             let total = 0;
 
-            cart.forEach(item => {
-                html += `
-                    <tr>
-                        <td>${item.service}</td>
-                        <td>${item.weight} ${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'}</td>
-                        <td>Rp ${item.price.toLocaleString()}</td>
-                        <td>Rp ${item.subtotal.toLocaleString()}</td>
-                        <td>
-                            <button class="btn btn-danger" onclick="removeFromCart(${item.id})" style="padding: 5px 10px; font-size: 12px;">
-                                🗑️
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                total += item.subtotal;
-            });
+
 
             cartItems.innerHTML = html;
             totalAmount.textContent = `Rp ${total.toLocaleString()}`;
@@ -979,7 +944,7 @@
             const statusHtml = `
                 <h2>📝 Update Status Transaksi</h2>
                 <h3>${transaction.id} - ${transaction.customer.name}</h3>
-                <p>Status saat ini: <span class="status-badge status-${transaction.status}">${getStatusText(transaction.status)}</span></p>
+                <p>Status saat ini: <span class="status -badge status-${transaction.status}">${getStatusText(transaction.status)}</span></p>
 
                 <div class="form-group">
                     <label>Pilih Status Baru:</label>
@@ -1043,19 +1008,18 @@
         }
 
         // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            
+        document.addEventListener('DOMContentLoaded', function () {
             updateTransactionHistory();
             updateStats();
 
             // Add event listener for weight input to handle decimal with comma
             const weightInput = document.getElementById('serviceWeight');
-            weightInput.addEventListener('input', function() {
+            weightInput.addEventListener('input', function () {
                 formatNumber(this);
             });
 
             // Close modal when clicking outside
-            window.onclick = function(event) {
+            window.onclick = function (event) {
                 const modal = document.getElementById('transactionModal');
                 if (event.target === modal) {
                     closeModal();
@@ -1065,7 +1029,12 @@
 
         // Update addToCart function to handle decimal with comma
         function addToCart() {
-            const serviceType = document.getElementById('serviceType').value;
+            // const serviceType = document.getElementById('serviceType').;
+            const selectService = document.getElementById('serviceType');
+            const optionService = selectService.options[selectService.selectedIndex];
+            const service_name = optionService.getAttribute('data-serv-name');
+            const priceService = parseInt(optionService.dataset.price);
+            const nameService = optionService.textContent;
             const weightValue = document.getElementById('serviceWeight').value;
             const weight = parseDecimal(weightValue);
             const notes = document.getElementById('notes').value;
@@ -1075,21 +1044,13 @@
                 return;
             }
 
-            const prices = {
-                 'Cuci Besar': 7000,
-                'Hanya Gosok': 5000,
-                'Hanya Cuci': 4500,
-                'Cuci dan Gosok': 5000,
-            };
-
-            const price = prices[serviceType];
-            const subtotal = price * weight;
+            const subtotal = priceService * weight;
 
             const item = {
                 id: Date.now(),
-                service: serviceType,
+                service: serviceName,
                 weight: weight,
-                price: price,
+                price: priceService,
                 subtotal: subtotal,
                 notes: notes
             };
@@ -1120,19 +1081,20 @@
             let total = 0;
 
             cart.forEach(item => {
-                const unit = item.service.includes('Sepatu') ? 'pasang' :
-                           item.service.includes('Karpet') ? 'm²' : 'kg';
+                // const unit = item.service.includes('Sepatu') ? 'pasang' :
+                //     item.service.includes('Karpet') ? 'm²' : 'kg';
 
-                // Format weight to show decimal properly
-                const formattedWeight = item.weight % 1 === 0 ?
-                    item.weight.toString() :
-                    item.weight.toFixed(1).replace('.', ',');
+                // // Format weight to show decimal properly
+                // const formattedWeight = item.weight % 1 === 0 ?
+                //     item.weight.toString() :
+                //     item.weight.toFixed(1).replace('.', ',');
+
 
                 html += `
                     <tr>
-                        <td>${item.service}</td>
-                        <td>${formattedWeight} ${unit}</td>
-                        <td>Rp ${item.price.toLocale String()}</td>
+                        <td> ${item.service}</td>
+                        <td>${item.weight}</td>
+                        <td>Rp ${item.price.toLocaleString()}</td>
                         <td>Rp ${item.subtotal.toLocaleString()}</td>
                         <td>
                             <button class="btn btn-danger" onclick="removeFromCart(${item.id})" style="padding: 5px 10px; font-size: 12px;">
@@ -1178,6 +1140,13 @@
 
         // Initialize with sample data
         addSampleData();
-
     </script>
-        </body>
+</body>
+
+
+
+
+
+
+
+

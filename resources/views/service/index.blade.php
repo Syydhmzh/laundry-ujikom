@@ -29,11 +29,11 @@
                                 <td>{{ $data->price }}</td>
                                 <td>{{ $data->description }}</td>
                                 <td>
-                                    <a href="" class="btn btn-success">Edit</a>
-                                    <form action="" method="POST" style="display: inline;">
+                                    <a href="{{ route('service.edit',  $data->id) }}" class="btn btn-success">Edit</a>
+                                    <form action="{{ route('service.destroy', $data->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <a href="" class="btn btn-danger m-2" type="submit" onclick="return confirm('yakin mau hapus?')">Delete </a>
+                                        <button class="btn btn-danger m-2" type="submit" onclick="return confirm('yakin mau hapus?')">Delete </button>
                                     </form>
                                 </td>
                             </tr>
