@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('assets/img/laundry.png') }}" rel="icon">
-  <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
     <title>{{ $title }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <style>
         * {
             margin: 0;
@@ -432,8 +433,8 @@
 
                 <form id="transactionForm">
                     <div class="form-group">
-                        <label for="customer_id">Customer</label>
-                        <select name="customer_id" id="customer_id" class="form-control" required>
+                        <label>Customer</label>
+                        <select name="customerName" id="customerName" class="form-control" required>
                             <option value="">Pilih Customer</option>
                             @foreach ($customers as $customer)
                                 <option data-phone="{{ $customer->phone }}" data-address="{{ $customer->address }}" value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -443,11 +444,11 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="customerPhone">No. Telepon</label>
+                            <label >No. Telepon</label>
                             <input type="tel" id="customerPhone" required>
                         </div>
                         <div class="form-group">
-                            <label for="customerAddress">Alamat</label>
+                            <label >Alamat</label>
                             <input type="text" id="customerAddress">
                         </div>
                     </div>
@@ -461,26 +462,6 @@
                             <div class="price">{{ $service->price }}/kg</div>
                         </button>
                         @endforeach
-                            {{-- <button type="button" class="service-card" onclick="addService('Cuci Setrika', 7000)">
-                                <h3>👔 Cuci Setrika</h3>
-                                <div class="price">Rp 7.000/kg</div>
-                            </button>
-                            <button type="button" class="service-card" onclick="addService('Setrika Saja', 3000)">
-                                <h3>🔥 Setrika Saja</h3>
-                                <div class="price">Rp 3.000/kg</div>
-                            </button>
-                            <button type="button" class="service-card" onclick="addService('Dry Clean', 15000)">
-                                <h3>✨ Dry Clean</h3>
-                                <div class="price">Rp 15.000/kg</div>
-                            </button>
-                            <button type="button" class="service-card" onclick="addService('Cuci Sepatu', 25000)">
-                                <h3>👟 Cuci Sepatu</h3>
-                                <div class="price">Rp 25.000/pasang</div>
-                            </button>
-                            <button type="button" class="service-card" onclick="addService('Cuci Karpet', 20000)">
-                                <h3>🏠 Cuci Karpet</h3>
-                                <div class="price">Rp 20.000/m²</div>
-                            </button> --}}
                         </div>
                     </div>
 
@@ -492,9 +473,9 @@
                         <div class="form-group">
                             <label for="serviceType">Jenis Layanan</label>
                             <select id="serviceType" required>
-                                <option disabled selected>Pilih Layanan</option>
+                                <option>Pilih Layanan</option>
                                 @foreach ($services as $service)
-                                <option data-serv-name="{{ $service->service_name }}" data-price="{{ $service->price }}" value="{{ $service->id }}">{{ $service->service_name }}</option>
+                                <option data-serv-name="{{ $service->service_name }}" data-price="{{ $service->price }}" value="{{ $service->id }}" >{{ $service->service_name }}</option>
                                 @endforeach
                                 {{-- <option value="Cuci Setrika">Cuci Setrika</option>
                                 <option value="Setrika Saja">Setrika Saja</option>
@@ -547,7 +528,7 @@
             <!-- Right Panel: Transaction History -->
             <div class="card">
                 <h2>📊 Riwayat Transaksi</h2>
-                <div class="transaction-list" id="">
+                <div class="transaction-list" id="transactionHistory">
                     @foreach ($datas as $key => $data )
                     <div class="transaction-item">
                         <h4>{{ $data->order_code }}</h4>
@@ -589,7 +570,7 @@
     </div>
 
     <script>
-        const selectCustomer = document.querySelector("#customer_id");
+        const selectCustomer = document.querySelector("#customerName");
         selectCustomer.addEventListener('change', () => {
             const optionCustomer = selectCustomer.options[selectCustomer.selectedIndex];
             const phoneCustomer = optionCustomer.dataset.phone;
@@ -601,8 +582,7 @@
         let cart = [];
         let transactions = JSON.parse(localStorage.getItem('laundryTransactions')) || [];
         let transactionCounter = transactions.length + 1;
-        let serviceName = document.getElementById('serviceType').options[ document.getElementById('serviceType').selectedIndex
-].text;
+        let serviceName = document.getElementById('serviceType').options[ document.getElementById('serviceType').selectedIndex].text;
 
 
         function addService(serviceName, price) {
@@ -628,8 +608,8 @@
 
 
 
-            cartItems.innerHTML = html;
-            totalAmount.textContent = `Rp ${total.toLocaleString()}`;
+            // cartItems.innerHTML = html;
+            // totalAmount.textContent = `Rp ${total.toLocaleString()}`;
         }
 
         function removeFromCart(itemId) {
@@ -643,8 +623,8 @@
             document.getElementById('transactionForm').reset();
         }
 
-        function processTransaction() {
-            const customerName = document.getElementById('customerName').value;
+       function processTransaction() {
+            const customerName = document.getElementById('customerName').options[document.getElementById('customerName').selectedIndex].text;
             const customerPhone = document.getElementById('customerPhone').value;
             const customerAddress = document.getElementById('customerAddress').value;
 
@@ -670,6 +650,25 @@
 
             transactions.push(transaction);
             localStorage.setItem('laundryTransactions', JSON.stringify(transactions));
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch("/trans", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify(transaction)
+
+            })
+            .then(response => response.json())
+            .then(function (result) {
+                console.log(result);
+            })
+                .catch(error => {
+                    console.log(error);
+                });
+
 
             transactionCounter++;
 
@@ -702,7 +701,7 @@
                         <strong>Detail Pesanan:</strong><br>
                         ${transaction.items.map(item => `
                             <div class="receipt-item">
-                                <span>${item.service} (${item.weight} ${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'})</span>
+                               <span>${item.service} (${item.weight} : 'kg'})</span>
                                 <span>Rp ${item.subtotal.toLocaleString()}</span>
                             </div>
                         `).join('')}
@@ -784,7 +783,7 @@
                             <h4>${transaction.id} - ${transaction.customer.name}</h4>
                             <p>📞 ${transaction.customer.phone}</p>
                             <p>🛍️ ${transaction.items.map(item => `${item.service} - ${item.weight}${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'}`).join(', ')}</p>
-                            <p>💰 Rp ${transaction.total.toLocaleString()}</p>
+                            <p>💰 Rp ${transaction.total != null ? transaction.total.toLocaleString() : '0'}</p>
                             <p>📅 ${new Date(transaction.date).toLocaleString('id-ID')}</p>
                             <span class="status-badge status-${transaction.status}">${getStatusText(transaction.status)}</span>
                             <button class="btn btn-primary" onclick="updateTransactionStatus('${transaction.id}')" style="margin-top: 10px; padding: 5px 15px; font-size: 12px;">
@@ -1044,11 +1043,19 @@
                 return;
             }
 
+            const prices = {
+                @foreach ($services as $service)
+                    '{{ $service->id }}': '{{ $service->price }}',
+                @endforeach
+
+            };
+
+            const price = prices[serviceType];
             const subtotal = priceService * weight;
 
             const item = {
                 id: Date.now(),
-                service: serviceName,
+                service: service_name,
                 weight: weight,
                 price: priceService,
                 subtotal: subtotal,

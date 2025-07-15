@@ -31,7 +31,7 @@ class TransOrderController extends Controller
         $title = 'Transaksi_order';
         $datas = TransOrders::with('customer')->orderBy('id', 'desc')->get();
         $customers = Customers::orderBy('id', 'asc')->get();
-         $services = TypeOfServices::orderBy('id', 'asc')->get();
+        $services = TypeOfServices::orderBy('id', 'asc')->get();
         return view('trans.index', compact('title', 'datas', 'customers', 'services'));
     }
 
@@ -57,6 +57,7 @@ class TransOrderController extends Controller
      */
     public function store(Request $request)
     {
+        // return response()->json($request->all());
         $transOrder = TransOrders::create([
             'id_customer' => $request->id_customer,
             'order_code' => $request->order_code,
